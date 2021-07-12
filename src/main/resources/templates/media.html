@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Medyalar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+          crossorigin="anonymous">
+</head>
+<body>
+<div th:replace="./fragments/menu :: menu"></div>
+
+<!-- Add media -->
+<div align="center">
+    <a th:href="@{/medya/kayit}" sec:authorize="isAuthenticated()"> Medya Ekle</a>
+</div>
+
+<!-- Search media -->
+<div align="center">
+    <form th:action="@{/medya/arama}" method="get">
+        <input id="keyword" name="keyword" placeholder="Medya Ara..." >
+        <button>Ara</button>
+    </form>
+</div>
+
+<!--Media table-->
+<table  align="center" style="position: relative; width: 500px;">
+    <thead>
+    <tr>
+        <th scope="col">Medya</th>
+    </tr>
+    </thead>
+    <tr th:if="${page.content.size()==0}">
+        <td colspan="1" align="center" style="color: red;">!!Kayıtlı Medya Yok!!</td>
+    </tr>
+    <tr th:each="m, iStat : ${page.content}">
+        <td th:text="${m.name}"/>
+        <td><a th:href="@{/film/medya/{name}/{id}(name=${m.name},id=${m.id})}">Filmleri</a></td>
+        <td><a sec:authorize="isAuthenticated()" th:if="${session_user.role=='ADMIN'}" th:href="@{/medya/guncelle/{id}(id=${m.id})}">Güncelle</a></td>
+        <td><a sec:authorize="isAuthenticated()" th:if="${session_user.role=='ADMIN'}" th:href="@{/medya/sil/{id}(id=${m.id})}">Sil</a></td>
+    </tr>
+</table>
+
+<!-- Pagination -->
+<nav aria-label="Page navigation" class="paging">
+    <ul class="pagination pagination-lg" style="position: relative;justify-content: center;" th:if="${page.pages.size()>1}">
+        <li th:each="i: ${page.pages}" class="page-item">
+            <a th:with="baseUrl=(${param.keyword}? '/medya/arama?keyword='+${param.keyword}+'&pageNumber='+${i} : '/medya?pageNumber='+${i})"
+               th:href="@{${baseUrl}}" th:text="${i}" class="page-link"/>
+        </li>
+    </ul>
+</nav>
+
+
+</body>
+</html>

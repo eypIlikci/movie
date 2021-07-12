@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Kategoriler</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+          crossorigin="anonymous">
+</head>
+<body>
+<div th:replace="./fragments/menu :: menu"></div>
+<!-- Add category -->
+<div align="center">
+    <a th:href="@{/kategori/kayit}" sec:authorize="isAuthenticated()"> Kategori Ekle</a>
+</div>
+
+<!--Search category -->
+<div align="center">
+    <form th:action="@{/kategori/arama}" method="get">
+        <input id="keyword" name="keyword" placeholder="Kategori Ara...">
+        <button>Ara</button>
+    </form>
+</div>
+
+<!-- Category table -->
+<table  align="center" style="position: relative; width: 500px;">
+    <thead>
+    <tr>
+        <th scope="col">Kategori</th>
+    </tr>
+    </thead>
+    <tr th:if="${page.content.size()==0}">
+        <td colspan="1" align="center" style="color: red;">!!Kayıtlı Kategori Yok!!</td>
+    </tr>
+    <tr th:each="category, iStat : ${page.content}">
+        <td th:text="${category.name}"/>
+        <td><a th:href="@{/film/kategori/{name}/{id}(name=${category.name},id=${category.id})}">Filmleri</a></td>
+        <td><a sec:authorize="isAuthenticated()" th:if="${session_user.role=='ADMIN'}" th:href="@{/kategori/guncelle/{id}(id=${category.id})}">Güncelle</a></td>
+        <td><a sec:authorize="isAuthenticated()" th:if="${session_user.role=='ADMIN'}" th:href="@{/kategori/sil/{id}(id=${category.id})}">Sil</a></td>
+
+    </tr>
+</table>
+
+<!-- Pagination -->
+<nav aria-label="Page navigation" class="paging">
+    <ul class="pagination pagination-lg"  style="position: relative;justify-content: center;" th:if="${page.pages.size()>1}">
+        <li th:each="i: ${page.pages}" class="page-item">
+            <a th:with="baseUrl=(${param.keyword}? '/kategori/arama?keyword='+${param.keyword}+'&pageNumber='+${i} : '/kategori?pageNumber='+${i})"
+               th:href="@{${baseUrl}}" th:text="${i}" class="page-link"/>
+        </li>
+    </ul>
+</nav>
+
+
+
+</body>
+</html>

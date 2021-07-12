@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+          crossorigin="anonymous">
+</head>
+<body>
+<div th:replace="./fragments/menu :: menu"></div>
+
+<!-- Add movie -->
+<div align="center">
+    <a th:href="@{/film/kayit}" sec:authorize="isAuthenticated()"> Film Ekle</a>
+</div>
+
+<!-- Search movie -->
+<div align="center">
+    <form th:action="@{/film/arama}" method="get">
+        <input id="keyword" name="keyword" placeholder="Film Ara...">
+        <button>Ara</button>
+    </form>
+</div>
+
+<!-- Filter movie -->
+<div th:if="${page.totalElements>1}" align="center ">
+    <a  th:with="url=${#request.requestURL} + '?sort=oldYear'+ (${param.keyword}? '&keyword='+${param.keyword}:'')"
+        th:href="@{${url}}">Önce Eski Tarih</a>
+    &nbsp;
+    <a  th:with="url=${#request.requestURL} + '?sort=newYear'+ (${param.keyword}? '&keyword='+${param.keyword}:'')"
+        th:href="@{${url}}">Önce Yeni Tarih</a>
+</div>
+
+<!--Movies size -->
+<div align="center">
+    <h5 th:if="${page.totalElements>0}" th:text="'Toplam Film:'+${page.totalElements}"/>
+</div>
+
+<!--Movies table -->
+ <table  align="center" style="position: relative; width: 500px;">
+     <thead>
+     <tr>
+         <th scope="col">Film Adı</th>
+         <th scope="col">Yapım Yılı</th>
+     </tr>
+     </thead>
+     <tr th:if="${page.content.size()==0}">
+         <td colspan="1" align="center" style="color: red;">!!Kayıtlı Film Yok!!</td>
+     </tr>
+     <tr th:each="movie, iStat : ${page.content}">
+         <td th:text="${movie.name}"/>
+         <td th:text="${movie.year}"/>
+         <td><a th:href="@{/film/{name}/{id}(name=${movie.name},id=${movie.id})}">Detay</a></td>
+     </tr>
+ </table>
+
+<!-- Pagination  -->
+<div align="center">
+    <nav aria-label="Page navigation" class="paging" >
+        <ul class="pagination pagination-lg" style="position: relative;justify-content: center;" th:if="${page.pages.size()>1}">
+            <li th:each="i: ${page.pages}" class="page-item" >
+                <a th:with="url=${#request.requestURL}+'?pageNumber='+${i}+(${param.sort}? '&sort='+${param.sort}:'')+(${param.keyword}? '&keyword='+${param.keyword}:'')"
+                   th:href="@{${url}}" th:text="${i}" class="page-link"></a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+          crossorigin="anonymous">
+</head>
+<body>
+<div th:replace="./fragments/menu :: menu"></div>
+<!-- Add actor -->
+<div align="center">
+    <a th:href="@{/aktor/kayit}" sec:authorize="isAuthenticated()"> Aktör Ekle</a>
+</div>
+
+<!-- Search actor -->
+<div align="center">
+    <form th:action="@{/aktor/arama}" method="get">
+        <input id="keyword" name="keyword" placeholder="Aktör Ara..." >
+        <button>Ara</button>
+    </form>
+</div>
+
+<!-- Actor table -->
+<table  align="center" style="position: relative; width: 500px;">
+    <thead>
+    <tr>
+        <th scope="col">Aktor</th>
+    </tr>
+    </thead>
+    <tr th:if="${page.content.size()==0}">
+        <td colspan="1" align="center" style="color: red;">!!Kayıtlı Aktor Yok!!</td>
+    </tr>
+    <tr th:each="actor, iStat : ${page.content}">
+        <td th:text="${actor.name}"/>
+        <td><a th:href="@{/film/aktor/{name}/{id}(name=${actor.name},id=${actor.id})}">Filmleri</a></td>
+        <td><a sec:authorize="isAuthenticated()" th:if="${session_user.role=='ADMIN'}" th:href="@{/aktor/guncelle/{id}(id=${actor.id})}">Güncelle</a></td>
+        <td><a sec:authorize="isAuthenticated()" th:if="${session_user.role=='ADMIN'}" th:href="@{/aktor/sil/{id}(id=${actor.id})}">Sil</a></td>
+    </tr>
+</table>
+
+<!-- Pagination -->
+<div align="center">
+    <nav aria-label="Page navigation" class="paging">
+        <ul class="pagination pagination-lg"   th:if="${page.pages.size()>1}" style="position: relative;justify-content: center;">
+            <li th:each="i: ${page.pages}" class="page-item">
+                <a th:with="baseUrl=(${param.keyword}? '/aktor/arama?keyword='+${param.keyword}+'&pageNumber='+${i} : '/aktor?pageNumber='+${i})"
+                   th:href="@{${baseUrl}}" th:text="${i}" class="page-link"/>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+</body>
+</html>

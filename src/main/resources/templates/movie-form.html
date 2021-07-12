@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+          crossorigin="anonymous">
+</head>
+<body>
+<div th:replace="./fragments/menu :: menu"></div>
+<div align="center">
+    <h2 th:text="${title}"/>
+</div>
+<div align="center">
+    <form th:action="${save}?'/film/kayit':'/film/guncelle'" th:object="${movie}" method="post">
+        <input type="hidden" th:if="${save==null}" th:field="*{id}">
+        <input type="text" th:field="*{name}"  placeholder="Film Adı..."/><br/><br/>
+        <p th:if="${name}" th:text="${name}"></p><br/>
+        <input type="number" th:field="*{year}" placeholder="Yapım Yılı..."/><br/><br/>
+        <p th:if="${year}" th:text="${year}"></p><br/>
+        <input type="text" th:field="*{explanation}"  placeholder="Açıklama..."/><br/><br/>
+        <p th:if="${explanation}" th:text="${explanation}"></p><br/>
+
+        <select  th:field="*{mediaId}"><br/><br/>
+            <option th:value=0 th:text="--Medya--"></option>
+            <option th:each="m : ${media}" th:value="${m.id}" th:text="${m.name}">
+            </option>
+        </select>
+
+        <select  th:field="*{categoryId}"><br/><br/>
+            <option th:value=0 th:text="--Kategori--"></option>
+            <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}">
+            </option>
+        </select>
+
+        <div th:each="i: ${#numbers.sequence(0, actors.size()/3)}"><br/><br/>
+            <input type="checkbox"
+                   th:if="${(i*3)<actors.size()}"
+                   th:field="*{actorsId}"
+                   th:value="${actors.get(i*3).id}"
+                   th:text="${actors.get(i*3).name}"/>&nbsp;
+            <input type="checkbox"
+                   th:if="${((i*3)+1)<actors.size()}"
+                   th:field="*{actorsId}"
+                   th:value="${actors.get((i*3)+1).id}"
+                   th:text="${actors.get((i*3)+1).name}"/>&nbsp;
+            <input type="checkbox"
+                   th:if="${((i*3)+2)<actors.size()}"
+                   th:field="*{actorsId}"
+                   th:value="${actors.get((i*3)+2).id}"
+                   th:text="${actors.get((i*3)+2).name}"/>
+        </div><br/>
+        <input type="submit" th:value="Kayıt"/>
+    </form>
+</div>
+
+</body>
+</html>
